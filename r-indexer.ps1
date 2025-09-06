@@ -1,0 +1,1 @@
+uv run --project "$PSScriptRoot" "$PSScriptRoot\main.py" $args
