@@ -12,10 +12,13 @@ dependencies = [
     "pyside6>=6.9.2",
     "pytesseract>=0.3.13",
     "sqlalchemy[mypy]==2.0.*",
+    "tqdm>=4.67.1",
+    "watchdog>=6.0.0",
     "whoosh>=2.7.4",
 ]
 
 [dependency-groups]
 dev = [
     "mypy>=1.17.1",
+    "types-tqdm>=4.67.0.20250809",
 ]

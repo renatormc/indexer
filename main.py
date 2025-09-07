@@ -1,9 +1,17 @@
+import logging
 from pathlib import Path
 import click
 import config
 from gui.gui import run_gui
 from indexer import update_index
 from models import init_db
+from watch import watch_folder
+
+logging.basicConfig(
+    filename=str(config.APPDIR / ".local/indexer.log"),
+    level=logging.DEBUG,
+    encoding="utf-8"
+)
 
 
 @click.group()
@@ -33,14 +41,19 @@ def install():
     print(f"Created script \"{path}\"")
 
 
-
 @cli.command("update-index")
 def update_index_():
     update_index()
 
+
 @cli.command("init")
 def init():
     init_db()
+
+
+@cli.command()
+def watch():
+    watch_folder()
 
 
 if __name__ == "__main__":

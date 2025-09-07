@@ -13,6 +13,7 @@ class Document(Base):
     content: Mapped[str] = mapped_column(sa.Text)
     sha256: Mapped[str] = mapped_column(sa.Text)
     path: Mapped[str] = mapped_column(sa.Text)
+    loc: Mapped[str | None] = mapped_column(sa.Text)
     index_timestamp: Mapped[float] = mapped_column(sa.Float)
 
     @property
@@ -101,3 +102,4 @@ def init_db() -> None:
     Base.metadata.create_all(eg)
     create_fts()
     create_triggers()
+

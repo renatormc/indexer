@@ -1,13 +1,17 @@
+from datetime import datetime
 from pathlib import Path
+import shutil
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QLineEdit, QScrollArea,
-    QVBoxLayout, QMainWindow
+    QVBoxLayout, QMainWindow, QMenuBar, QMenu, QFileDialog, QInputDialog
 )
-from PySide6.QtGui import QIcon
+from PySide6.QtGui import QIcon, QAction
 from PySide6.QtCore import Qt
 
 import config
+from database import DBSession
 from gui.result_widget import ResultWidget
+from indexer import index_pdf
 from repo import search_documents
 from utils import startfile
 
@@ -22,6 +26,15 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Indexer")
         self.setMinimumSize(800, 800)
         self.setWindowIcon(get_icon("app_icon.jpg"))
+
+        # Add menu bar and File menu
+        menubar = QMenuBar(self)
+        file_menu = QMenu("File", self)
+        add_file_action = QAction("Add file", self)
+        add_file_action.triggered.connect(self.add_file)
+        file_menu.addAction(add_file_action)
+        menubar.addMenu(file_menu)
+        self.setMenuBar(menubar)
 
         central_widget = QWidget()
         main_layout = QVBoxLayout()
@@ -55,11 +68,42 @@ class MainWindow(QMainWindow):
 
         for doc in docs:
             widget = ResultWidget(doc)
-            widget.openRequested.connect(self.open_file)
             self.results_layout.addWidget(widget)
 
-    def open_file(self, path: str | Path) -> None:
-        startfile((Path(".") / path).absolute())
+    def add_file(self):
+        file_paths, _ = QFileDialog.getOpenFileNames(
+            self,
+            "Add PDF Files",
+            "",
+            "PDF Files (*.pdf)"
+        )
+        if file_paths:
+            prefix, ok = QInputDialog.getText(
+                self,
+                "Optional Prefix",
+                "Enter an optional prefix for these files:"
+            )
+            
+            if ok:
+                if prefix:
+                    folder = Path(prefix)
+                    try:
+                        folder.mkdir(parents=True)
+                    except FileExistsError:
+                        pass
+                else:
+                    folder = Path(".")
+                with DBSession() as db_session:
+                    t = datetime.now().timestamp()
+                    for f in file_paths:
+                        p = Path(f)
+                        dest = folder / p.name
+                        shutil.copy(p, folder / p.name)
+                        index_pdf(db_session, dest, t, commit=False)
+                    db_session.commit()
+                    
+                   
 
-    
+
+
 
