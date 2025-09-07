@@ -1,6 +1,7 @@
 from datetime import datetime
 from pathlib import Path
 import shutil
+import threading
 from PySide6.QtWidgets import (
     QWidget, QVBoxLayout, QLineEdit, QScrollArea,
     QVBoxLayout, QMainWindow, QMenuBar, QMenu, QFileDialog, QInputDialog
@@ -14,6 +15,7 @@ from gui.result_widget import ResultWidget
 from indexer import index_pdf
 from repo import search_documents
 from utils import startfile
+from watch import watch_folder
 
 
 def get_icon(name) -> QIcon:
@@ -26,6 +28,10 @@ class MainWindow(QMainWindow):
         self.setWindowTitle("Indexer")
         self.setMinimumSize(800, 800)
         self.setWindowIcon(get_icon("app_icon.jpg"))
+
+        # Start watch_folder in a background thread
+        self._watcher_thread = threading.Thread(target=watch_folder, daemon=True)
+        self._watcher_thread.start()
 
         # Add menu bar and File menu
         menubar = QMenuBar(self)
@@ -101,8 +107,8 @@ class MainWindow(QMainWindow):
                         shutil.copy(p, folder / p.name)
                         index_pdf(db_session, dest, t, commit=False)
                     db_session.commit()
-                    
-                   
+
+
 
 
 

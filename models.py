@@ -23,7 +23,7 @@ class Document(Base):
     @classmethod
     def search(cls, session: Session, query: str, limit: int | None = None):
         sql_text = """
-            SELECT d.id, d.title, d.content, d.description, d.sha256, d.path, d.index_timestamp,
+            SELECT d.id, d.title, d.content, d.description, d.sha256, d.path, d.index_timestamp, d.loc,
                    bm25(document_fts) AS rank
             FROM document_fts f
             JOIN document d ON d.id = f.rowid
@@ -48,7 +48,8 @@ class Document(Base):
                 description=row.description,
                 sha256=row.sha256,
                 path=row.path,
-                index_timestamp=row.index_timestamp
+                index_timestamp=row.index_timestamp,
+                loc=row.loc
             )
             for row in result
         ]

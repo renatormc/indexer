@@ -129,6 +129,7 @@ def index_pdf(db_session: Session, path: str | Path, index_timestamp: float | No
 
 
 def on_delete_file(db_session: Session, path: Path) -> None:
+    
     doc = db_session.query(Document).where(Document.path == path.as_posix()).first()
     if doc:
         delete_thumbnail(doc)  
