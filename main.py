@@ -6,6 +6,7 @@ from gui.gui import run_gui
 from indexer import update_index
 from models import init_db
 from watch import watch_folder
+import os
 
 logging.basicConfig(
     filename=str(config.APPDIR / ".local/indexer.log"),
@@ -27,7 +28,7 @@ def gui():
 
 @cli.command()
 def install():
-    path = config.APPDIR / "dev.ps1"
+    path = config.APPDIR / "dev.ps1" if os.name == "nt" else config.APPDIR / "dev"
     text = path.read_text(encoding="utf-8")
     text = text.replace("$PSScriptRoot", str(config.APPDIR))
     lines = text.splitlines()
@@ -36,7 +37,7 @@ def install():
         if "#removeline" in line:
             lines.pop(original_i)
     text = "\n".join(lines)
-    path = Path.home() / ".local/bin/r-index.ps1"
+    path = Path.home() / ".local/bin/r-index.ps1" if os.name == "nt" else Path.home() / ".local/bin/r-index"
     path.write_text(text, encoding="utf-8")
     print(f"Created script \"{path}\"")
 

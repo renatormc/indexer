@@ -1,5 +1,4 @@
 #!/bin/bash
-SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-
-cd /media/c/gdrive/Documentos
-uv run --project "$SCRIPT_DIR" "$SCRIPT_DIR/main.py" "$@"
+PSScriptRoot=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd ) #removeline
+cd /media/c/gdrive/Documentos #removeline
+uv run --project "$PSScriptRoot" "$PSScriptRoot/main.py" "$@"
