@@ -1,0 +1,11 @@
+[Desktop Entry]
+Type=Application
+Name=Indexer
+GenericName=Indexer
+Comment=Manage documents
+Exec=/media/a/src/indexer/.venv/python  /media/a/src/indexer/main.py gui -w /media/c/gdrive/Documentos
+Icon=/media/a/src/indexer/gui/assets/app_icon.jpg
+Terminal=false
+Categories=Office;Utility;
+MimeType=application/pdf;application/msword;text/plain;
+Path=/media/c/gdrive/Documentos

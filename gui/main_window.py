@@ -14,7 +14,7 @@ from database import DBSession
 from gui.result_widget import ResultWidget
 from indexer import index_pdf
 from repo import search_documents
-from utils import startfile
+from utils import show_in_file_manager, startfile
 from watch import watch_folder
 
 
@@ -36,9 +36,9 @@ class MainWindow(QMainWindow):
         # Add menu bar and File menu
         menubar = QMenuBar(self)
         file_menu = QMenu("File", self)
-        add_file_action = QAction("Add file", self)
-        add_file_action.triggered.connect(self.add_file)
-        file_menu.addAction(add_file_action)
+        open_folder_action = QAction("Open folder", self)
+        open_folder_action.triggered.connect(self.open_folder)
+        file_menu.addAction(open_folder_action)
         menubar.addMenu(file_menu)
         self.setMenuBar(menubar)
 
@@ -76,38 +76,8 @@ class MainWindow(QMainWindow):
             widget = ResultWidget(doc)
             self.results_layout.addWidget(widget)
 
-    def add_file(self):
-        file_paths, _ = QFileDialog.getOpenFileNames(
-            self,
-            "Add PDF Files",
-            "",
-            "PDF Files (*.pdf)"
-        )
-        if file_paths:
-            prefix, ok = QInputDialog.getText(
-                self,
-                "Optional Prefix",
-                "Enter an optional prefix for these files:"
-            )
-            
-            if ok:
-                if prefix:
-                    folder = Path(prefix)
-                    try:
-                        folder.mkdir(parents=True)
-                    except FileExistsError:
-                        pass
-                else:
-                    folder = Path(".")
-                with DBSession() as db_session:
-                    t = datetime.now().timestamp()
-                    for f in file_paths:
-                        p = Path(f)
-                        dest = folder / p.name
-                        shutil.copy(p, folder / p.name)
-                        index_pdf(db_session, dest, t, commit=False)
-                    db_session.commit()
-
+    def open_folder(self):
+        show_in_file_manager(".")
 
 
 

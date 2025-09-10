@@ -22,7 +22,10 @@ def cli():
 
 
 @cli.command()
-def gui():
+@click.option("-w", required=False, help="Workpath")
+def gui(w):
+    if w:
+        os.chdir(w)
     run_gui()
 
 

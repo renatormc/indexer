@@ -74,6 +74,7 @@ class ResultWidget(QFrame):
         show_action = menu.addAction("Show in folder")
         edit_desc_action = menu.addAction("Edit description")
         set_loc_action = menu.addAction("Set location")
+        show_content_action = menu.addAction("Show content")
         action = menu.exec(event.globalPos())
         if action == open_action:
             startfile((Path(".") / self.doc.path).absolute())
@@ -116,3 +117,17 @@ class ResultWidget(QFrame):
                     db_session.execute(update(Document).where(Document.id == self.doc.id).values(loc=self.doc.loc))
                     db_session.commit()
                 self.load(self.doc)
+        elif action == show_content_action:
+            dialog = QDialog(self)
+            dialog.setWindowTitle("Content")
+            dialog.resize(600, 800) 
+            layout = QVBoxLayout(dialog)
+            text_edit = QTextEdit(dialog)
+            text_edit.setReadOnly(True)
+            text_edit.setPlainText(self.doc.content or "")
+            layout.addWidget(text_edit)
+            buttons = QDialogButtonBox(QDialogButtonBox.StandardButton.Ok, dialog)
+            layout.addWidget(buttons)
+            buttons.accepted.connect(dialog.accept)
+            dialog.exec()
+            

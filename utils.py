@@ -29,6 +29,4 @@ def show_in_file_manager(path: str | Path) -> None:
         elif file_manager == "nautilus":
             subprocess.Popen([file_manager, "--select", str(path)])
         elif file_manager == "nemo":
-            subprocess.Popen([file_manager, "--browser", "--select", str(path)])
-        else:
-            subprocess.Popen([file_manager, str(path.parent)])
+            subprocess.Popen([file_manager, str(path)])
