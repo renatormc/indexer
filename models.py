@@ -22,6 +22,10 @@ class Document(Base):
 
     @classmethod
     def search(cls, session: Session, query: str, limit: int | None = None):
+        # Add * after each term for prefix search
+        terms = query.strip().split()
+        query_with_wildcards = " ".join(f"{t}*" for t in terms)
+
         sql_text = """
             SELECT d.id, d.title, d.content, d.description, d.sha256, d.path, d.index_timestamp, d.loc,
                    bm25(document_fts) AS rank
@@ -35,7 +39,7 @@ class Document(Base):
             sql_text += " LIMIT :limit"
 
         sql = sa.text(sql_text)
-        params = {"query": query}
+        params = {"query": f"{query}*"}
         if limit is not None:
             params["limit"] = str(limit)
 
@@ -60,7 +64,14 @@ def create_fts():
     with engine.connect() as conn:
         conn.execute(sa.text("""
             CREATE VIRTUAL TABLE IF NOT EXISTS document_fts
-            USING fts5(title, content, description, content='document', content_rowid='id');
+            USING fts5(
+                title, 
+                content, 
+                description, 
+                content='document', 
+                content_rowid='id',
+                prefix='2 3'
+            );
         """))
 
 
@@ -103,4 +114,3 @@ def init_db() -> None:
     Base.metadata.create_all(eg)
     create_fts()
     create_triggers()
-
