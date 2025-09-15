@@ -7,6 +7,7 @@ from indexer import update_index
 from models import init_db
 from watch import watch_folder
 import os
+import stat
 
 logging.basicConfig(
     filename=str(config.APPDIR / ".local/indexer.log"),
@@ -42,6 +43,8 @@ def install():
     text = "\n".join(lines)
     path = Path.home() / ".local/bin/r-index.ps1" if os.name == "nt" else Path.home() / ".local/bin/r-index"
     path.write_text(text, encoding="utf-8")
+    if os.name != "nt":
+        path.chmod(path.stat().st_mode | stat.S_IEXEC)
     print(f"Created script \"{path}\"")
 
 
