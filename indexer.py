@@ -116,7 +116,12 @@ def index_pdf(db_session: Session, path: str | Path, index_timestamp: float | No
                 db_session.commit()
     elif res.action == "new" or res.action == "duplicated":
         doc = Document()
-        doc.content = extract_text_with_ocr(path)
+        try:
+            doc.content = extract_text_with_ocr(path)
+        except Exception as e:
+            print(f"Error extracting text from {path}:")
+            print(e)
+            return
         doc.title = path.name
         doc.path = path.as_posix()
         doc.sha256 = res.sha256
